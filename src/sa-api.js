@@ -579,69 +579,56 @@ code.google.com/p/crypto-js/wiki/License
     module.exports ? module.exports = exports = u : exports = u : F.jsSHA = u
 })(this);
 
-var secureAuthConfig = {
-  'user': '',
-  'password': '',
-  'token': '',
-  'ip_address': ''
-};
+// var secureAuthConfig = {};
 
 function saConfig(realm, appserver, appid, appkey) {
   this.realm = realm;
   this.appServer = appserver;
   this.appID = appid;
   this.appKey = appkey;
-  this.properties = {};
-  this.method = '';
-  this.url = '';
-  this.data = {};
-  this.successHandler = new function() {};
-  this.errorHandler = new function() {};
   return this;
 }
 
-function buildAuthHeader(action, date, path, content) {
+function buildAuthHeader(action, date, path, content, appID, appKey) {
   var params = [];
   params.push(action);
   params.push(date);
-  params.push(secureAuthConfig.appID);
+  params.push(appID);
   params.push(path);
   if (content.trim().length > 1) {
     params.push(content);
   }
   var param = params.join("\n");
   var shaObj = new jsSHA(param, "TEXT");
-  var hash = shaObj.getHMAC(secureAuthConfig.appKey, "HEX", "SHA-256", "B64");
-  var raw = secureAuthConfig.appID + ":" + hash;
+  var hash = shaObj.getHMAC(appKey, "HEX", "SHA-256", "B64");
+  var raw = appID + ":" + hash;
   var authVal = window.btoa(unescape(encodeURIComponent(raw)));
   return authVal;
 }
 
-function buildURI(withServer) {
+function buildURI(withServer, url, appServer, realm, user) {
   if (withServer) {
-    if (secureAuthConfig.url.indexOf('$') > 1) {
-      return secureAuthConfig.appServer + '/' + secureAuthConfig.realm + '/' +
-        secureAuthConfig.url.replace('$USER$', secureAuthConfig.properties.user);
+    if (url.indexOf('$') > 1) {
+      return appServer + '/' + realm + '/' + url.replace('$USER$', user);
     } else {
-      return secureAuthConfig.appServer + '/' + secureAuthConfig.realm + '/' +
-        secureAuthConfig.url;
+      return appServer + '/' + realm + '/' + url;
     }
   } else {
-    if (secureAuthConfig.url.indexOf('$') > 1) {
-      return '/' + secureAuthConfig.realm + '/' + secureAuthConfig.url.replace(
-        '$USER$', secureAuthConfig.properties.user);
+    if (url.indexOf('$') > 1) {
+      return '/' + realm + '/' + url.replace('$USER$', user);
     } else {
-      return '/' + secureAuthConfig.realm + '/' + secureAuthConfig.url;
+      return '/' + realm + '/' + url;
     }
   }
 }
 
 function secureAuthApi(config, actionNm, properties, successHandle, errorHandle) {
   this.actionName = actionNm;
-  secureAuthConfig = config;
+  this.config = config;
   this.props = properties;
-  secureAuthConfig.properties = properties;
-  console.error(secureAuthConfig.properties);
+  // secureAuthConfig.properties = properties;
+  // console.warn('Properties are here');
+  // console.info(secureAuthConfig.properties);
   if (successHandle)
     this.success = successHandle;
   else
@@ -719,47 +706,48 @@ secureAuthApi.prototype = {
     console.info(a);
     return a;
   },
-  matchProperty: function(val) {
-    var k = Object.keys(val);
-    console.warn(secureAuthConfig.properties);
+  matchProperty: function() {
+    var k = Object.keys(this.action.properties);
+    // console.warn(secureAuthConfig.properties);
     for (var i = 0; i < k.length; i++) {
-      if (val[k[i]].indexOf('$') > -1) {
+      if (this.action.properties[k[i]].indexOf('$') > -1) {
         //console.info(val[k[i]]);
-        switch (val[k[i]]) {
+        switch (this.action.properties[k[i]]) {
           case '$USER$':
-            val[k[i]] = secureAuthConfig.properties.user;
+            this.action.properties[k[i]] = this.props.user;
             break;
           case '$PWD$':
-            console.info('Changing Password from ' +
-              val[k[i]] + ' to ' + secureAuthConfig.properties.password);
-            val[k[i]] = secureAuthConfig.properties.password;
+            // console.info('Changing Password from ' +
+            // val[k[i]] + ' to ' + secureAuthConfig.properties.password);
+            this.action.properties[k[i]] = this.props.password;
             break;
           case '$OTP$':
-            val[k[i]] = secureAuthConfig.properties.type;
+            this.action.properties[k[i]] = this.props.type;
             break;
           case '$TOKEN$':
-            console.info('Changing Token from ' +
-              val[k[i]] + ' to ' + secureAuthConfig.properties.token);
-            val[k[i]] = secureAuthConfig.properties.token;
+            // console.info('Changing Token from ' +
+            //   val[k[i]] + ' to ' + secureAuthConfig.properties.token);
+            this.action.properties[k[i]] = this.props.token;
             break;
           case '$ID$':
-            val[k[i]] = secureAuthConfig.properties.factor_id;
+            this.action.properties[k[i]] = this.props.factor_id;
             break;
           case '$IP$':
-            console.info('Changing Token from ' +
-              val[k[i]] + ' to ' + secureAuthConfig.properties.ip_address
-            );
-            val[k[i]] = secureAuthConfig.properties.ip_address;
+            // console.info('Changing Token from ' +
+            //   val[k[i]] + ' to ' + secureAuthConfig.properties.ip_address
+            // );
+            this.action.properties[k[i]] = this.props.ip_address;
             break;
         }
       }
     }
+    console.warn(this.action.properties);
   },
   loadInit: function() {
-    if (this.isNullorUndefined(secureAuthConfig.realm) || this.isNullorUndefined(
-        secureAuthConfig.appServer) || this.isNullorUndefined(
-        secureAuthConfig.appID) ||
-      this.isNullorUndefined(secureAuthConfig.appKey))
+    if (this.isNullorUndefined(this.config.realm) || this.isNullorUndefined(
+        this.config.appServer) || this.isNullorUndefined(
+        this.config.appID) ||
+      this.isNullorUndefined(this.config.appKey))
       this.throwError.push({
         "status": "error",
         "message": "The SecureAuthApi configuration was not properly configured. Please ensure you have included the Server URL, SecureAuth Realm, App ID, and App Key"
@@ -790,12 +778,12 @@ secureAuthApi.prototype = {
           this.action = this.actions.ip_eval;
           break;
       }
-      if (!this.isNullorUndefined(this.action.method)) {
-        secureAuthConfig.method = this.action.method;
-        secureAuthConfig.successHandler = this.success;
-        secureAuthConfig.errorHandler = this.error;
-        secureAuthConfig.url = this.action.url;
-      }
+      // if (!this.isNullorUndefined(this.action.method)) {
+      //   secureAuthConfig.method = this.action.method;
+      //   secureAuthConfig.successHandler = this.success;
+      //   secureAuthConfig.errorHandler = this.error;
+      //   secureAuthConfig.url = this.action.url;
+      // }
     }
   },
   getProperties: function() {
@@ -808,11 +796,11 @@ secureAuthApi.prototype = {
         "message": "There were no properties submitted and this action requires properties."
       });
     else {
-      secureAuthConfig.data = this.action.properties;
-      //console.info(secureAuthConfig.properties);
-      this.matchProperty(secureAuthConfig.data);
-      //console.info(secureAuthConfig.data);
-
+      // secureAuthConfig.data = this.action.properties;
+      // console.info(secureAuthConfig.properties);
+      // this.matchProperty(secureAuthConfig.data);
+      // console.info(secureAuthConfig.data);
+      this.matchProperty();
     }
   },
   XMLHttpFactories: [
@@ -853,25 +841,29 @@ secureAuthApi.prototype = {
       });
     }
     var date = new Date().toUTCString();
-    var authHeader = buildAuthHeader(secureAuthConfig.method, date,
-      buildURI(false), secureAuthConfig.method === 'POST' ? JSON.stringify(
-        secureAuthConfig.data) : "");
-    req.open(secureAuthConfig.method, buildURI(true), true);
+    var authHeader = buildAuthHeader(this.action.method, date,
+      buildURI(false, this.action.url, this.config.appServer, this.config
+        .realm, this.props.user), this.action
+      .method === 'POST' ? JSON.stringify(this.action.properties) : "",
+      this.config.appID, this.config.appKey);
+    req.open(this.action.method, buildURI(true, this.action.url, this.config
+      .appServer, this.config.realm, this.props.user), true);
     req.setRequestHeader("Authorization", "Basic " + authHeader);
     req.setRequestHeader("X-SA-Date", date);
     req.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
-
+    var succ = this.success;
+    var err = this.error;
     req.onreadystatechange = function() {
       if (req.readyState != 4) return;
       if (req.status != 200 && req.status != 304) {
-        secureAuthConfig.errorHandler(req);
+        err(req);
         return;
       }
-      secureAuthConfig.successHandler(null, req);
+      succ(null, req);
     }
     if (req.readyState == 4) return;
-    req.send(secureAuthConfig.method === 'POST' ? JSON.stringify(
-      secureAuthConfig.data) : null);
+    req.send(this.action.method === 'POST' ? JSON.stringify(
+      this.action.properties) : null);
   },
   send: function() {
     if (this.isNullorUndefined(this.throwError)) {
