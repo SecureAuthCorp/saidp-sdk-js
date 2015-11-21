@@ -1,0 +1,79 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+    </head>
+    <body>
+        <h1>SecureAuth API Test Harness for JS API</h1>
+        <p>Enter the required values and look for the expected result.</p>
+        <form>
+          <label for="txtURL">
+            Server URL: <input accept="text/plain" name="txtURL" id="txtURL" type="textbox" />
+          </label>
+          <label for="txtRealm">
+            Realm: <input accept="text/plain" name="txtRealm" id="txtRealm" type="textbox" />
+          </label>
+          <label for="txtAppId">
+            AppID: <input accept="text/plain" name="txtAppId" id="txtAppId" type="textbox" />
+          </label>
+          <label for="txtAppKey">
+            AppKey: <input accept="text/plain" name="txtAppKey" id="txtAppKey" type="textbox" />
+          </label>
+          <label for="txtIPAddress">
+            IP Address: <input accept="text/plain" name="txtIPAddress" id="txtIPAddress" type="textbox" />
+          </label>
+          <label for="txtUserID">
+            UserID: <input accept="text/plain" name="txtUserID" id="txtUserID" type="textbox" />
+          </label>
+          <label for="txtPassword">
+            Password: <input accept="text/plain" name="txtPassword" id="txtPassword" type="textbox" />
+          </label>
+          <a onclick="TestMe();">Test Current Version</a>
+        </form>
+        <br />
+        <div id="test1">
+          <h3> Test #1 UserID Validation</h3>
+
+        </div>
+        <div id="test2">
+          <h3> Test #2 Password Validation</h3>
+
+        </div>
+        <div id="test3">
+          <h3> Test #3 IP Evaluation Validation</h3>
+
+        </div>
+        <div id="test4">
+          <h3> Test #4 Get Factors Validation</h3>
+
+        </div>
+        <script type="text/javascript" src="../src/sa-api.js"></script>
+        <script>
+        function Get(id){
+          return document.getElementById(id).value;
+        }
+        function Set(id, val){
+          // var html = document.getElementById(id).innerHTML;
+          document.getElementById(id).innerHTML = val;
+        }
+        function TestMe(){
+          var c = new saConfig(Get('txtRealm'),Get('txtURL'),Get('txtAppId'),Get('txtAppKey'));
+          var user = Get('txtUserID');
+          var pwd = Get('txtPassword');
+          var ip = Get('txtIPAddress');
+          var a = [user,pwd,ip];
+          // console.info(a.join(", "));
+          var t1 = new secureAuthApi(c,'user',{'user': user},function(err,data){Set('test1',data.responseText);},function(err){Set('test1',err.message);});
+          var t2 = new secureAuthApi(c,'pwd',{'password': 'Raelin21','user':'bschick'},function(err,data){Set('test2',data.responseText);},function(err){Set('test2',err.message);});
+          var t3 = new secureAuthApi(c,'ipeval',{'user': user, 'ip_address': ip},function(err,data){Set('test3',data.responseText);},function(err){Set('test3',err.message);});
+          var t4 = new secureAuthApi(c,'get-2fa',{'user': user},function(err,data){Set('test4',data.responseText);},function(err){Set('test4',err.message);});
+          t1.send();
+          t2.send();
+          t3.send();
+          t4.send();
+        }
+        </script>
+    </body>
+</html>
