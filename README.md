@@ -1,5 +1,5 @@
 # SecureAuth REST API Javascript SDK
-SecureAuth REST API's are now accessible via pure JavaScript with no external libraries necessary. View the REST Authentication API
+SecureAuth REST API's are now accessible via pure JavaScript with no external libraries necessary. View the SecureAuth REST Authentication API details [here](https://docs.secureauth.com/x/WQABAg).
 
 ## Licenses
 JavaScript SDK utilizes the following other libraries as well as the native JavaScript XMLHttpRequest object. 
@@ -28,12 +28,15 @@ JavaScript SDK utilizes the following other libraries as well as the native Java
     ```var c = new saConfig("SecureAuth1","https://localhost","aa6013a324fe48c983d8c900c8f39743","96a90f6375402bdad77f5a43a602c5a8199dc8c006e1b1d9388c9dcf1c777712");```
     
 3. Create the secureAuthApi Object
-```var t = new secureAuthApi([saConfig Object],[API Action],[Properties Object],[Success Callback],[Error Callback]);```
+```var t = new secureAuthApi([saConfig Object],[API Action]([API][]),[Properties Object],[Success Callback],[Error Callback]);```
     
     EXAMPLE: 
     ```var s = new secureAuthApi(c,'user',{'user':'bschick'},console.info,console.error);```
 
-### API Actions
+4. Execute the __send()__ method.
+	```t.send()```
+
+### API Actions [API]
 - __user__ Validate the UserID Only
     - Required *Properties Object* __user__
 - __pwd__ Validate the UserID and Password Only

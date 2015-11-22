@@ -579,8 +579,6 @@ code.google.com/p/crypto-js/wiki/License
     module.exports ? module.exports = exports = u : exports = u : F.jsSHA = u
 })(this);
 
-// var secureAuthConfig = {};
-
 function saConfig(realm, appserver, appid, appkey) {
   this.realm = realm;
   this.appServer = appserver;
@@ -626,9 +624,6 @@ function secureAuthApi(config, actionNm, properties, successHandle, errorHandle)
   this.actionName = actionNm;
   this.config = config;
   this.props = properties;
-  // secureAuthConfig.properties = properties;
-  // console.warn('Properties are here');
-  // console.info(secureAuthConfig.properties);
   if (successHandle)
     this.success = successHandle;
   else
@@ -703,45 +698,34 @@ secureAuthApi.prototype = {
     for (var i = 0; i < c; i++) {
       a.push(i + ":" + c[i]);
     }
-    console.info(a);
     return a;
   },
   matchProperty: function() {
     var k = Object.keys(this.action.properties);
-    // console.warn(secureAuthConfig.properties);
     for (var i = 0; i < k.length; i++) {
       if (this.action.properties[k[i]].indexOf('$') > -1) {
-        //console.info(val[k[i]]);
         switch (this.action.properties[k[i]]) {
           case '$USER$':
             this.action.properties[k[i]] = this.props.user;
             break;
           case '$PWD$':
-            // console.info('Changing Password from ' +
-            // val[k[i]] + ' to ' + secureAuthConfig.properties.password);
             this.action.properties[k[i]] = this.props.password;
             break;
           case '$OTP$':
             this.action.properties[k[i]] = this.props.type;
             break;
           case '$TOKEN$':
-            // console.info('Changing Token from ' +
-            //   val[k[i]] + ' to ' + secureAuthConfig.properties.token);
             this.action.properties[k[i]] = this.props.token;
             break;
           case '$ID$':
             this.action.properties[k[i]] = this.props.factor_id;
             break;
           case '$IP$':
-            // console.info('Changing Token from ' +
-            //   val[k[i]] + ' to ' + secureAuthConfig.properties.ip_address
-            // );
             this.action.properties[k[i]] = this.props.ip_address;
             break;
         }
       }
     }
-    console.warn(this.action.properties);
   },
   loadInit: function() {
     if (this.isNullorUndefined(this.config.realm) || this.isNullorUndefined(
@@ -778,12 +762,6 @@ secureAuthApi.prototype = {
           this.action = this.actions.ip_eval;
           break;
       }
-      // if (!this.isNullorUndefined(this.action.method)) {
-      //   secureAuthConfig.method = this.action.method;
-      //   secureAuthConfig.successHandler = this.success;
-      //   secureAuthConfig.errorHandler = this.error;
-      //   secureAuthConfig.url = this.action.url;
-      // }
     }
   },
   getProperties: function() {
@@ -796,10 +774,6 @@ secureAuthApi.prototype = {
         "message": "There were no properties submitted and this action requires properties."
       });
     else {
-      // secureAuthConfig.data = this.action.properties;
-      // console.info(secureAuthConfig.properties);
-      // this.matchProperty(secureAuthConfig.data);
-      // console.info(secureAuthConfig.data);
       this.matchProperty();
     }
   },

@@ -3,7 +3,53 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title></title>
+        <title>JavaScript SDK for SecureAuth REST Authentication API</title>
+        <style type="text/css">
+          body {
+            font-family: Verdana, serif;
+          }
+          h1, h3 {
+            padding: 10px;
+          }
+          label {
+            font-weight: bold;
+            font-size: 85%;
+            padding: 5px;
+            display: block;
+          }
+          label > input {
+            font-weight: normal;
+          }
+          #test1, #test2, #test3, #test4 {
+            border: 1px solid #f0f0f0;
+            padding: 5px;
+            margin: 5px;
+          }
+          a {
+            background: #ccc;
+            padding: 15px 20px;
+            border: #ddd solid 2px;
+            border-radius: 5px;
+            color: #fff;
+            display: block;
+            text-align: center;
+            width: 33%;
+          }
+          a:hover {
+            background: #000;
+            color: #fff;
+            border-top-color: #eee;
+            border-left-color: #eee;
+          }
+          .found, .valid, .verified {
+            color: #4F8A10;
+            background-color: #DFF2BF;
+          }
+          .error {
+            color: #D8000C;
+            background-color: #FFBABA;
+          }
+        </style>
     </head>
     <body>
         <h1>SecureAuth API Test Harness for JS API</h1>
@@ -49,26 +95,30 @@
           <h3> Test #4 Get Factors Validation</h3>
 
         </div>
-        <script type="text/javascript" src="../src/sa-api.js"></script>
+        <script type="text/javascript" src="../dist/sa-api.min.js"></script>
         <script>
         function Get(id){
           return document.getElementById(id).value;
         }
         function Set(id, val){
-          // var html = document.getElementById(id).innerHTML;
-          document.getElementById(id).innerHTML = val;
+          if(val !== undefined || val !== null){
+            var v = JSON.parse(val);
+          document.getElementById(id).setAttribute('class',v.status);
+          document.getElementById(id).innerText = id.toUpperCase()+': '+v.status;
+        }
+        else {
+          document.getElementById(id).setAttribute('class','error');
+        }
         }
         function TestMe(){
           var c = new saConfig(Get('txtRealm'),Get('txtURL'),Get('txtAppId'),Get('txtAppKey'));
           var user = Get('txtUserID');
           var pwd = Get('txtPassword');
           var ip = Get('txtIPAddress');
-          var a = [user,pwd,ip];
-          // console.info(a.join(", "));
           var t1 = new secureAuthApi(c,'user',{'user': user},function(err,data){Set('test1',data.responseText);},function(err){Set('test1',err.message);});
           var t2 = new secureAuthApi(c,'pwd',{'password': 'Raelin21','user':'bschick'},function(err,data){Set('test2',data.responseText);},function(err){Set('test2',err.message);});
-          var t3 = new secureAuthApi(c,'ipeval',{'user': user, 'ip_address': ip},function(err,data){Set('test3',data.responseText);},function(err){Set('test3',err.message);});
-          var t4 = new secureAuthApi(c,'get-2fa',{'user': user},function(err,data){Set('test4',data.responseText);},function(err){Set('test4',err.message);});
+          var t3 = new secureAuthApi(c,'ipeval',{'user': user, 'ip_address': ip},function(err,data){Set('test3',data.response);},function(err){Set('test3',err.message);});
+          var t4 = new secureAuthApi(c,'get-2fa',{'user': user},function(err,data){Set('test4',data.response);},function(err){Set('test4',err.message);});
           t1.send();
           t2.send();
           t3.send();

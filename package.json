@@ -1,6 +1,6 @@
 {
   "name": "sa_js_api",
-  "version": "0.2.0",
+  "version": "0.2.4",
   "description": "SecureAuth REST Authentication API JavaScript API",
   "main": "sa-api.js",
   "directories": {

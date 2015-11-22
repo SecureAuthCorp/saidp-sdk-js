@@ -5,6 +5,7 @@ var replace = require('gulp-replace');
 var bump = require('gulp-bump');
 var gutil = require('gulp-util');
 var git = require('gulp-git');
+var clean = require('gulp-clean');
 var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
 
