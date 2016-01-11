@@ -2,7 +2,8 @@
 SecureAuth REST API's are now accessible via pure JavaScript with no external libraries necessary. View the SecureAuth REST Authentication API details [here](https://docs.secureauth.com/x/WQABAg).
 
 ## Licenses
-JavaScript SDK utilizes the following other libraries as well as the native JavaScript XMLHttpRequest object. 
+SecureAuth REST API Javascript SDK is licensed under the BSD 3-Clause license.
+REST API JavaScript SDK also utilizes the following libraries as well as the native JavaScript XMLHttpRequest object. 
 - [jsSHA](http://caligatio.github.com/jsSHA) BSD License Copyright Brian Turek 2008-2015
 - [CryptoJS v.3.1.2](https://code.google.com/p/crypto-js) License is available [here](https://code.google.com/p/crypto-js/wiki/License). (c) 2009-2013 by Jeff Mott. All rights reserved.
 
@@ -34,7 +35,10 @@ JavaScript SDK utilizes the following other libraries as well as the native Java
     ```var s = new secureAuthApi(c,'user',{'user':'bschick'},console.info,console.error);```
 
 4. Execute the __send()__ method.
-	```t.send()```
+
+	 EXAMPLE: 
+    ```var s = new secureAuthApi(c,'user',{'user':'bschick'},console.info,console.error);
+	s.send();```
 
 ### API Actions
 - __user__ Validate the UserID Only
